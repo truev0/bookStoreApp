@@ -1,0 +1,78 @@
+@model bookStoreApp.Models.Entities.Sale
+
+@{
+    ViewData["Title"] = "Create Sale";
+}
+
+<h1>Create Sale</h1>
+
+<h4>Sale</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div class="form-group">
+                <label asp-for="CustomerId" class="control-label"></label>
+                <input asp-for="CustomerId" class="form-control" />
+                <span asp-validation-for="CustomerId" class="text-danger"></span>
+            </div>
+
+            <div id="saleLines">
+                <div class="sale-line">
+                    <div class="form-group">
+                        <label>Book ID</label>
+                        <input class="form-control book-id" />
+                    </div>
+                    <div class="form-group">
+                        <label>Book Name</label>
+                        <input class="form-control book-name" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input class="form-control book-price" readonly />
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input class="form-control book-quantity" />
+                    </div>
+                </div>
+            </div>
+            <button type="button" id="addSaleLine" class="btn btn-primary">Add Book</button>
+
+            <div class="form-group">
+                <label asp-for="SaleDate" class="control-label"></label>
+                <input asp-for="SaleDate" class="form-control" />
+                <span asp-validation-for="SaleDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#addSaleLine').click(function () {
+                var saleLine = $('.sale-line').first().clone();
+                $('#saleLines').append(saleLine);
+            });
+
+            $('#saleLines').on('change', '.book-id', function () {
+                var bookId = $(this).val();
+                var saleLine = $(this).closest('.sale-line');
+                $.ajax({
+                    url: '@Url.Action("GetBookDetails", "Sales")',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { id: bookId },
+                    success: function (data) {
+                        saleLine.find('.book-name').val(data.name);
+                        saleLine.find('.book-price').val(data.price);
+                    }
+                });
+            });
+        });
+    </script>
+}
